@@ -1,10 +1,16 @@
-const imageContainer = document.getElementById('image-container');
-
 // Function to generate a random Imgur link
 function getRandomImgurLink() {
-    const randomId = Math.floor(Math.random() * 1000000000); // Random number for Imgur ID
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let randomId = '';
+    
+    // Generate a random 7-character string (Imgur image IDs are typically 7 characters long)
+    for (let i = 0; i < 7; i++) {
+        randomId += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+
     return `https://i.imgur.com/${randomId}.jpg`; // Assuming the image is a JPG
 }
+
 
 // Function to check if an image is valid
 function checkImageValid(url) {

@@ -18,11 +18,19 @@ function getRandomImgurLink() {
 function checkImageValid(url) {
     return new Promise((resolve) => {
         const img = new Image();
-        img.onload = () => resolve(true); // Image loaded successfully
+        img.onload = () => {
+            // Check if the image is the error image (161x81)
+            if (img.width === 161 && img.height === 81) {
+                resolve(false); // Invalid image
+            } else {
+                resolve(true); // Valid image
+            }
+        };
         img.onerror = () => resolve(false); // Error loading image
         img.src = url;
     });
 }
+
 
 // Function to load a new image
 async function loadImage() {

@@ -4,17 +4,13 @@ const imageContainer = document.getElementById('image-container');
 function getRandomImgurLink() {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let randomId = '';
-    
-    // Generate a random 5-character string (Imgur image IDs are typically 5 characters long)
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 7; i++) { // Imgur IDs are typically 7 characters long
         randomId += characters.charAt(Math.floor(Math.random() * characters.length));
     }
-
     return `https://i.imgur.com/${randomId}.jpg`; // Assuming the image is a JPG
 }
 
-
-// Function to check if an image is valid
+// Function to check if an image is valid (not the error image)
 function checkImageValid(url) {
     return new Promise((resolve) => {
         const img = new Image();
@@ -31,7 +27,6 @@ function checkImageValid(url) {
     });
 }
 
-
 // Function to load a new image
 async function loadImage() {
     let validImage = false;
@@ -46,17 +41,23 @@ async function loadImage() {
     // Create an img element and add it to the container
     const imgElement = document.createElement('img');
     imgElement.src = imgUrl;
-    imageContainer.appendChild(imgElement);
+    imageContainer.appendChild(imgElement); // Append the image to the container
 }
 
-// Infinite scroll functionality
+// Infinite scroll functionality with preloading
 let isLoading = false;
-let page = 1;
 
 function handleScroll() {
-    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100 && !isLoading) {
+    // Check if the user is near the bottom (200px before the bottom)
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 200 && !isLoading) {
         isLoading = true;
-        loadImage().then(() => {
+        // Load 3 images at once (or any number you prefer)
+        const numberOfImagesToLoad = 3;
+        let loadPromises = [];
+        for (let i = 0; i < numberOfImagesToLoad; i++) {
+            loadPromises.push(loadImage());
+        }
+        Promise.all(loadPromises).then(() => {
             isLoading = false;
         });
     }

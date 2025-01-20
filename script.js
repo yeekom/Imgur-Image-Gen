@@ -1,3 +1,5 @@
+const imageContainer = document.getElementById('image-container');
+
 // Function to generate a random Imgur link
 function getRandomImgurLink() {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

@@ -3,8 +3,8 @@ function getRandomImgurLink() {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let randomId = '';
     
-    // Generate a random 7-character string (Imgur image IDs are typically 7 characters long)
-    for (let i = 0; i < 7; i++) {
+    // Generate a random 5-character string (Imgur image IDs are typically 5 characters long)
+    for (let i = 0; i < 5; i++) {
         randomId += characters.charAt(Math.floor(Math.random() * characters.length));
     }
 

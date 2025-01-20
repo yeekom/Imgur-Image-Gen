@@ -1,10 +1,12 @@
 const imageContainer = document.getElementById('image-container');
+const loadImagesButton = document.getElementById('load-images-button');
+const imageCountInput = document.getElementById('image-count');
 
 // Function to generate a random Imgur link
 function getRandomImgurLink() {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let randomId = '';
-    for (let i = 0; i < 5; i++) { // Imgur IDs are typically 5 characters long
+    for (let i = 0; i < 7; i++) { // Imgur IDs are typically 7 characters long
         randomId += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     return `https://i.imgur.com/${randomId}.jpg`; // Assuming the image is a JPG
@@ -44,29 +46,19 @@ async function loadImage() {
     imageContainer.appendChild(imgElement); // Append the image to the container
 }
 
-// Infinite scroll functionality with preloading
-let isLoading = false;
-
-function handleScroll() {
-    // Check if the user is near the bottom (200px before the bottom)
-    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 200 && !isLoading) {
-        isLoading = true;
-        // Load 3 images at once (or any number you prefer)
-        const numberOfImagesToLoad = 3;
-        let loadPromises = [];
-        for (let i = 0; i < numberOfImagesToLoad; i++) {
-            loadPromises.push(loadImage());
-        }
-        Promise.all(loadPromises).then(() => {
-            isLoading = false;
-        });
+// Function to load a specified number of images
+function loadMultipleImages(count) {
+    for (let i = 0; i < count; i++) {
+        loadImage();
     }
 }
 
-// Load initial images
-for (let i = 0; i < 10; i++) {
-    loadImage();
-}
-
-// Add scroll event listener
-window.addEventListener('scroll', handleScroll);
+// Add event listener to the button to load images when clicked
+loadImagesButton.addEventListener('click', () => {
+    const count = parseInt(imageCountInput.value, 10); // Get the number from the input field
+    if (count > 0) {
+        loadMultipleImages(count); // Load the specified number of images
+    } else {
+        alert('Please enter a valid number');
+    }
+});

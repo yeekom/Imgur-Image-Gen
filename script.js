@@ -6,7 +6,7 @@ const imageCountInput = document.getElementById('image-count');
 function getRandomImgurLink() {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let randomId = '';
-    for (let i = 0; i < 7; i++) { // Imgur IDs are typically 7 characters long
+    for (let i = 0; i < 5; i++) { // Imgur IDs are typically 5 characters long
         randomId += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     return `https://i.imgur.com/${randomId}.jpg`; // Assuming the image is a JPG

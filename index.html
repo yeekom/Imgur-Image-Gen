@@ -8,29 +8,59 @@
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
+            margin: 0;
+        }
+
+        #top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
         }
 
         #image-settings {
-            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #progress {
+            font-size: 14px;
+        }
+
+        #image-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 5px;
         }
 
         #image-container img {
-            width: 200px;
-            margin: 5px;
-            display: inline-block;
-            vertical-align: top;
+            width: 100%;
+            display: block;
+            border-radius: 4px;
+        }
+
+        input, select, button {
+            padding: 5px 10px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <div id="image-settings">
-        <input type="number" id="image-count" placeholder="Enter number of images" min="1">
-        <select id="id-length">
-            <option value="5">5 Characters</option>
-            <option value="6">6 Characters</option>
-            <option value="7" selected>7 Characters</option>
-        </select>
-        <button id="load-images-button">Load Images</button>
+    <div id="top-bar">
+        <div id="image-settings">
+            <input type="number" id="image-count" placeholder="Enter number of images" min="1">
+            <select id="id-length">
+                <option value="5">5 Characters</option>
+                <option value="6">6 Characters</option>
+                <option value="7" selected>7 Characters</option>
+            </select>
+            <button id="load-images-button">Load Images</button>
+        </div>
+        <div id="progress">
+            Checked: 0 | Found: 0
+        </div>
     </div>
 
     <div id="image-container"></div>
@@ -40,6 +70,14 @@
         const loadImagesButton = document.getElementById('load-images-button');
         const imageCountInput = document.getElementById('image-count');
         const idLengthSelect = document.getElementById('id-length');
+        const progressDisplay = document.getElementById('progress');
+
+        let checkedCount = 0;
+        let foundCount = 0;
+
+        function updateProgress() {
+            progressDisplay.textContent = `Checked: ${checkedCount} | Found: ${foundCount}`;
+        }
 
         function getRandomImgurLink(length) {
             const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -47,20 +85,26 @@
             for (let i = 0; i < length; i++) {
                 randomId += characters.charAt(Math.floor(Math.random() * characters.length));
             }
-            return `https://i.imgur.com/${randomId}.jpg`; // Assuming JPG images
+            return `https://i.imgur.com/${randomId}.jpg`;
         }
 
         function checkImageValid(url) {
             return new Promise((resolve) => {
                 const img = new Image();
                 img.onload = () => {
+                    checkedCount++;
+                    updateProgress();
                     if (img.width === 161 && img.height === 81) {
                         resolve(false);
                     } else {
                         resolve(true);
                     }
                 };
-                img.onerror = () => resolve(false);
+                img.onerror = () => {
+                    checkedCount++;
+                    updateProgress();
+                    resolve(false);
+                };
                 img.src = url;
             });
         }
@@ -73,6 +117,9 @@
                 imgUrl = getRandomImgurLink(charLength);
                 validImage = await checkImageValid(imgUrl);
             }
+
+            foundCount++;
+            updateProgress();
 
             const imgElement = document.createElement('img');
             imgElement.src = imgUrl;

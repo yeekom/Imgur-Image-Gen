@@ -4,18 +4,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Random Imgur Image Generator</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        #image-settings {
+            margin-bottom: 20px;
+        }
+
+        #image-container img {
+            width: 200px;
+            margin: 5px;
+            display: inline-block;
+            vertical-align: top;
+        }
+    </style>
 </head>
 <body>
-    <!-- Input box and button to specify number of images to load -->
     <div id="image-settings">
         <input type="number" id="image-count" placeholder="Enter number of images" min="1">
+        <select id="id-length">
+            <option value="5">5 Characters</option>
+            <option value="6">6 Characters</option>
+            <option value="7" selected>7 Characters</option>
+        </select>
         <button id="load-images-button">Load Images</button>
     </div>
 
-    <!-- Image container -->
     <div id="image-container"></div>
 
-    <script src="script.js"></script>
+    <script>
+        const imageContainer = document.getElementById('image-container');
+        const loadImagesButton = document.getElementById('load-images-button');
+        const imageCountInput = document.getElementById('image-count');
+        const idLengthSelect = document.getElementById('id-length');
+
+        function getRandomImgurLink(length) {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let randomId = '';
+            for (let i = 0; i < length; i++) {
+                randomId += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return `https://i.imgur.com/${randomId}.jpg`; // Assuming JPG images
+        }
+
+        function checkImageValid(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    if (img.width === 161 && img.height === 81) {
+                        resolve(false);
+                    } else {
+                        resolve(true);
+                    }
+                };
+                img.onerror = () => resolve(false);
+                img.src = url;
+            });
+        }
+
+        async function loadImage(charLength) {
+            let validImage = false;
+            let imgUrl;
+
+            while (!validImage) {
+                imgUrl = getRandomImgurLink(charLength);
+                validImage = await checkImageValid(imgUrl);
+            }
+
+            const imgElement = document.createElement('img');
+            imgElement.src = imgUrl;
+            imageContainer.appendChild(imgElement);
+        }
+
+        function loadMultipleImages(count, charLength) {
+            for (let i = 0; i < count; i++) {
+                loadImage(charLength);
+            }
+        }
+
+        loadImagesButton.addEventListener('click', () => {
+            const count = parseInt(imageCountInput.value, 10);
+            const charLength = parseInt(idLengthSelect.value, 10);
+
+            if (count > 0) {
+                loadMultipleImages(count, charLength);
+            } else {
+                alert('Please enter a valid number of images.');
+            }
+        });
+    </script>
 </body>
 </html>

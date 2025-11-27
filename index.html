@@ -30,45 +30,19 @@
         }
     
         #image-container {
-            column-count: 5;
-            column-gap: 10px;
+            position: relative;
+            width: 100%;
         }
     
         #image-container img {
-            max-width: 100%;
-            width: 100%;
+            position: absolute;
+            max-width: 300px;
+            width: auto;
             height: auto;
             object-fit: contain;
             border-radius: 4px;
             opacity: 0;
             animation: fadeIn 0.3s ease-in forwards;
-            margin-bottom: 10px;
-            display: block;
-            break-inside: avoid;
-        }
-
-        @media (max-width: 1400px) {
-            #image-container {
-                column-count: 4;
-            }
-        }
-
-        @media (max-width: 1100px) {
-            #image-container {
-                column-count: 3;
-            }
-        }
-
-        @media (max-width: 800px) {
-            #image-container {
-                column-count: 2;
-            }
-        }
-
-        @media (max-width: 500px) {
-            #image-container {
-                column-count: 1;
-            }
         }
 
         @keyframes fadeIn {
@@ -116,6 +90,56 @@
         let checkedCount = 0;
         let foundCount = 0;
         let isLoading = false;
+        const columnHeights = [];
+        const columnWidth = 310;
+        const gap = 10;
+        let numColumns = Math.floor(window.innerWidth / columnWidth);
+
+        function initColumns() {
+            numColumns = Math.floor(window.innerWidth / columnWidth);
+            columnHeights.length = 0;
+            for (let i = 0; i < numColumns; i++) {
+                columnHeights.push(0);
+            }
+        }
+
+        initColumns();
+
+        window.addEventListener('resize', () => {
+            const newNumColumns = Math.floor(window.innerWidth / columnWidth);
+            if (newNumColumns !== numColumns) {
+                initColumns();
+                repositionAllImages();
+            }
+        });
+
+        function repositionAllImages() {
+            const images = imageContainer.querySelectorAll('img');
+            initColumns();
+            
+            images.forEach((img) => {
+                positionImage(img);
+            });
+
+            updateContainerHeight();
+        }
+
+        function positionImage(img) {
+            const shortestColumn = columnHeights.indexOf(Math.min(...columnHeights));
+            const x = shortestColumn * columnWidth;
+            const y = columnHeights[shortestColumn];
+
+            img.style.left = x + 'px';
+            img.style.top = y + 'px';
+
+            const imgHeight = img.naturalHeight * (300 / img.naturalWidth) || 0;
+            columnHeights[shortestColumn] += imgHeight + gap;
+        }
+
+        function updateContainerHeight() {
+            const maxHeight = Math.max(...columnHeights);
+            imageContainer.style.height = maxHeight + 'px';
+        }
 
         function updateProgress() {
             progressDisplay.textContent = `Checked: ${checkedCount} | Found: ${foundCount}`;
@@ -165,6 +189,12 @@
 
             const imgElement = document.createElement('img');
             imgElement.src = imgUrl;
+            
+            imgElement.onload = () => {
+                positionImage(imgElement);
+                updateContainerHeight();
+            };
+            
             imageContainer.appendChild(imgElement);
         }
 
@@ -172,7 +202,7 @@
             isLoading = true;
             loadImagesButton.disabled = true;
 
-            const batchSize = 5;
+            const batchSize = 69;
             for (let i = 0; i < count; i += batchSize) {
                 const currentBatch = Math.min(batchSize, count - i);
                 const promises = [];

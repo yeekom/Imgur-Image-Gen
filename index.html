@@ -30,20 +30,33 @@
         }
     
         #image-container {
-            columns: 5 200px; /* Try 5 columns with max 200px width each */
-            column-gap: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
         }
     
         #image-container img {
-            width: 100%; /* Width of the column */
-            margin-bottom: 10px;
+            width: 200px;
+            height: auto;
             border-radius: 4px;
-            display: block;
+            opacity: 0;
+            animation: fadeIn 0.3s ease-in forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
         }
     
         input, select, button {
             padding: 5px 10px;
             font-size: 14px;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -74,6 +87,7 @@
 
         let checkedCount = 0;
         let foundCount = 0;
+        let isLoading = false;
 
         function updateProgress() {
             progressDisplay.textContent = `Checked: ${checkedCount} | Found: ${foundCount}`;
@@ -126,13 +140,29 @@
             imageContainer.appendChild(imgElement);
         }
 
-        function loadMultipleImages(count, charLength) {
-            for (let i = 0; i < count; i++) {
-                loadImage(charLength);
+        async function loadMultipleImages(count, charLength) {
+            isLoading = true;
+            loadImagesButton.disabled = true;
+
+            const batchSize = 5;
+            for (let i = 0; i < count; i += batchSize) {
+                const currentBatch = Math.min(batchSize, count - i);
+                const promises = [];
+                
+                for (let j = 0; j < currentBatch; j++) {
+                    promises.push(loadImage(charLength));
+                }
+                
+                await Promise.all(promises);
             }
+
+            isLoading = false;
+            loadImagesButton.disabled = false;
         }
 
         loadImagesButton.addEventListener('click', () => {
+            if (isLoading) return;
+
             const count = parseInt(imageCountInput.value, 10);
             const charLength = parseInt(idLengthSelect.value, 10);
 

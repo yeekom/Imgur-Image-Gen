@@ -36,8 +36,7 @@
     
         #image-container img {
             position: absolute;
-            max-width: 300px;
-            width: auto;
+            width: 300px;
             height: auto;
             object-fit: contain;
             border-radius: 4px;
@@ -202,7 +201,7 @@
             isLoading = true;
             loadImagesButton.disabled = true;
 
-            const batchSize = 69;
+            const batchSize = 5;
             for (let i = 0; i < count; i += batchSize) {
                 const currentBatch = Math.min(batchSize, count - i);
                 const promises = [];

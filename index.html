@@ -201,7 +201,7 @@
             isLoading = true;
             loadImagesButton.disabled = true;
 
-            const batchSize = 5;
+            const batchSize = 167;
             for (let i = 0; i < count; i += batchSize) {
                 const currentBatch = Math.min(batchSize, count - i);
                 const promises = [];
